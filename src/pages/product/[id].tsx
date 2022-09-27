@@ -9,6 +9,7 @@ import { stripe } from '../../lib/stripe'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { useState } from 'react'
 import axios from 'axios'
+import Head from 'next/head'
 
 interface ProductProps {
   product: {
@@ -21,35 +22,43 @@ interface ProductProps {
   }
 }
 export default function Product({ product }: ProductProps) {
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false)
   async function handleBuyButton() {
     try {
-      setIsCreatingCheckoutSession(true);
+      setIsCreatingCheckoutSession(true)
       const response = await axios.post('/api/checkout', {
         priceId: product.defaultPriceId,
       })
-      const { checkoutUrl } = response.data;
-      window.location.href = checkoutUrl;
+      const { checkoutUrl } = response.data
+      window.location.href = checkoutUrl
     } catch (err) {
-      setIsCreatingCheckoutSession(false);
+      setIsCreatingCheckoutSession(false)
       alert('Falha ao redirecionar ao checkout!')
     }
   }
   return (
-    <ProductContainer>
-      <ImageContainer>
-        <Image src={product.imageUrl} width={520} height={480} alt='' />
-      </ImageContainer>
-      <ProductDetails>
-        <h1>{product.name}</h1>
-        <p>{product.description}</p>
-        <p>{product.description}</p>
-        <button disabled={isCreatingCheckoutSession} onClick={handleBuyButton}
-        >
-          Comprar agora
-        </button>
-      </ProductDetails>
-    </ProductContainer>
+    <>
+      <Head>
+        <title>{product.name} | Ignite Shop</title>
+      </Head>
+      <ProductContainer>
+        <ImageContainer>
+          <Image src={product.imageUrl} width={520} height={480} alt='' />
+        </ImageContainer>
+        <ProductDetails>
+          <h1>{product.name}</h1>
+          <p>{product.description}</p>
+          <p>{product.description}</p>
+          <button
+            disabled={isCreatingCheckoutSession}
+            onClick={handleBuyButton}
+          >
+            Comprar agora
+          </button>
+        </ProductDetails>
+      </ProductContainer>
+    </>
   )
 }
 export const getStaticPaths: GetStaticPaths = async () => {
